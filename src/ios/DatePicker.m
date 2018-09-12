@@ -54,6 +54,8 @@
   [self updateCancelButton:options];
   [self updateDoneButton:options];
   
+  [self.datePicker addTarget:self action:@selector(datePickerScrollerChanged:) forControlEvents:UIControlEventValueChanged];
+
   UIInterfaceOrientation deviceOrientation = [UIApplication sharedApplication].statusBarOrientation;
   
   CGFloat width;
@@ -140,6 +142,20 @@
 
 - (void)dateChangedAction:(id)sender {
   [self jsDateSelected];
+}
+
+- (void)datePickerScrollerChanged:(id)sender {
+  UIDatePicker *datePicker = sender;
+  if(self.datePicker == datePicker){
+    printf("Value of picker is %s\n", 
+      [[[self.datePicker date] description] cString]);
+
+      NSTimeInterval seconds = [self.datePicker.date timeIntervalSince1970];
+      NSString *jsCallback = [NSString stringWithFormat:@"datePicker._datePickerChanged(\"%f\");", seconds];
+        
+      [self.commandDelegate evalJs:jsCallback];
+
+  }
 }
 
 #pragma mark - JS API
